@@ -146,10 +146,10 @@ function DashBoard() {
           Contact Us
         </h2>
 
-        {/* Two-column layout */}
+       
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           
-          {/* Left: Contact Info */}
+         
           <Card className="p-6 border border-gray-200 shadow-md bg-white">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">
               Caritas Matha Hospital

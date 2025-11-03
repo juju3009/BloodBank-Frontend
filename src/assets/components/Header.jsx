@@ -13,7 +13,7 @@ function Header() {
       <Navbar fluid rounded className="bg-black text-white shadow-md">
         {/* main container */}
         <div className="container mx-auto grid grid-cols-3 items-center px-4 py-2">
-          {/* ---------- LEFT: Brand ---------- */}
+          {/*LEFT: Brand */}
           <div className="flex items-center justify-start">
             <NavbarBrand href="#" className="p-0">
               <div className="flex items-center gap-2">
@@ -29,7 +29,7 @@ function Header() {
             </NavbarBrand>
           </div>
 
-          {/* ---------- CENTER: Nav Links ---------- */}
+          
           <nav className="flex items-center justify-center">
             <div className="hidden md:flex space-x-6">
               <Link
@@ -51,7 +51,7 @@ function Header() {
                 Edit
               </Link>
               <Link
-                to="/contact"
+                to="#contact"
                 className="text-white hover:text-red-500 transition-colors duration-200"
               >
                 Contact
@@ -59,7 +59,7 @@ function Header() {
             </div>
           </nav>
 
-          {/* ---------- RIGHT: Sign In Button ---------- */}
+          {/*  RIGHT: Sign In Button  */}
           <div className="flex items-center justify-end space-x-4">
             <Link to="/login">
               <Button

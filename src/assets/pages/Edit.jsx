@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 function Edit() {
   const [donors, setDonors] = useState([]);
 
-  // Fetch donors from backend
+  // Fetching donors from backend
   const fetchDonors = async () => {
     try {
       const res = await getDonorAPI();
@@ -22,12 +22,12 @@ function Edit() {
     }
   };
 
-  // Fetch on component mount
+  
   useEffect(() => {
     fetchDonors();
   }, []);
 
-  // Delete donor
+  // Deleting donor
   const handleDelete = async (id) => {
     Swal.fire({
       title: "Are you sure?",
