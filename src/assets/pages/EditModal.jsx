@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, ModalBody, ModalFooter, Select, Label } from "flowbite-react";
+import { Button, Modal, Label, Select } from "flowbite-react";
 import { HiX } from "react-icons/hi";
+import Swal from "sweetalert2";
 import { updateDonorAPI } from "../../services/allAPIs";
 
 function EditModal({ donor, refresh }) {
   const [openModal, setOpenModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    fullname: "",
+    fullName: "",
     email: "",
     phone: "",
     bloodGroup: "",
@@ -14,12 +16,11 @@ function EditModal({ donor, refresh }) {
     donationDate: "",
   });
 
-  // Prefill data when modal opens
+  // Prefill donor info when modal opens
   useEffect(() => {
     if (openModal && donor) {
-      console.log("Donor loaded:", donor);
       setFormData({
-        fullname: donor.fullname || donor.fullName || "",
+        fullName: donor.fullName || donor.fullname || "",
         email: donor.email || "",
         phone: donor.phone || "",
         bloodGroup: donor.bloodGroup || donor.bloodgroup || "",
@@ -29,28 +30,41 @@ function EditModal({ donor, refresh }) {
     }
   }, [openModal, donor]);
 
-  // Handle change
+  // Handle form input changes
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setFormData({ ...formData, [id]: value });
+    setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  // Handle update
+  // Handle donor update
   const handleUpdate = async () => {
-    try {
-      await updateDonorAPI(donor.id, formData);
-      setOpenModal(false);
+    if (!formData.fullName || !formData.bloodGroup) {
+      Swal.fire("Warning", "Full Name and Blood Group are required.", "warning");
+      return;
+    }
 
-      // Prevent crash if refresh not passed
-      if (typeof refresh === "function") refresh();
+    try {
+      setLoading(true);
+      const res = await updateDonorAPI(donor.id, formData);
+
+      if (res.status === 200) {
+        Swal.fire("Success!", "Donor details updated successfully.", "success");
+        setOpenModal(false);
+        refresh?.(); // refresh donor list
+      } else {
+        Swal.fire("Error!", "Failed to update donor details.", "error");
+      }
     } catch (err) {
       console.error("Update failed:", err);
+      Swal.fire("Error!", "Unable to update donor. Try again later.", "error");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      {/* Trigger Button */}
+    <>
+      {/* Trigger button */}
       <button
         onClick={() => setOpenModal(true)}
         className="bg-white text-black px-3 py-1.5 rounded-full font-medium text-xs hover:bg-gray-200 transition"
@@ -64,22 +78,25 @@ function EditModal({ donor, refresh }) {
           {/* Header */}
           <div className="flex justify-between items-center border-b border-gray-700 px-6 py-4">
             <h3 className="text-lg font-semibold text-white">Edit Donor Details</h3>
-            <button onClick={() => setOpenModal(false)} className="text-gray-400 hover:text-white transition">
+            <button
+              onClick={() => setOpenModal(false)}
+              className="text-gray-400 hover:text-white transition"
+            >
               <HiX className="w-5 h-5" />
             </button>
           </div>
 
           {/* Body */}
-          <ModalBody className="p-6 space-y-4">
+          <div className="p-6 space-y-4">
             {/* Full Name */}
             <div>
-              <Label htmlFor="fullname" className="text-sm text-gray-300 mb-1 block">
+              <Label htmlFor="fullName" className="text-sm text-gray-300 mb-1 block">
                 Full Name
               </Label>
               <input
-                id="fullname"
+                id="fullName"
                 type="text"
-                value={formData.fullname}
+                value={formData.fullName}
                 onChange={handleChange}
                 placeholder="Enter full name"
                 className="w-full rounded-lg border border-gray-700 bg-gray-900 text-white px-3 py-2 text-sm focus:ring-2 focus:ring-red-500"
@@ -129,13 +146,13 @@ function EditModal({ donor, refresh }) {
               >
                 <option value="">Select blood group</option>
                 <option value="A+">A+</option>
-                <option value="A−">A−</option>
+                <option value="A-">A-</option>
                 <option value="B+">B+</option>
-                <option value="B−">B−</option>
+                <option value="B-">B-</option>
                 <option value="O+">O+</option>
-                <option value="O−">O−</option>
+                <option value="O-">O-</option>
                 <option value="AB+">AB+</option>
-                <option value="AB−">AB−</option>
+                <option value="AB-">AB-</option>
               </Select>
             </div>
 
@@ -167,15 +184,16 @@ function EditModal({ donor, refresh }) {
                 className="w-full rounded-lg border border-gray-700 bg-gray-900 text-white px-3 py-2 text-sm focus:ring-2 focus:ring-red-500"
               />
             </div>
-          </ModalBody>
+          </div>
 
           {/* Footer */}
-          <ModalFooter className="flex justify-end gap-3 border-t border-gray-700 px-6 py-4">
+          <div className="flex justify-end gap-3 border-t border-gray-700 px-6 py-4">
             <Button
               onClick={handleUpdate}
+              disabled={loading}
               className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-semibold"
             >
-              Update
+              {loading ? "Updating..." : "Update"}
             </Button>
             <Button
               color="gray"
@@ -184,10 +202,10 @@ function EditModal({ donor, refresh }) {
             >
               Cancel
             </Button>
-          </ModalFooter>
+          </div>
         </div>
       </Modal>
-    </div>
+    </>
   );
 }
 
